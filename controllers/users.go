@@ -4,6 +4,8 @@ import (
 	"004-go-web/views"
 	"fmt"
 	"net/http"
+
+	"github.com/gorilla/schema"
 )
 
 // Users struct
@@ -25,6 +27,12 @@ func (u *Users) New(w http.ResponseWriter, r *http.Request) {
 	u.NewView.Render(w, nil)
 }
 
+// SignUpForm will be use to store form data
+type SignUpForm struct {
+	Email    string `schema:"email"`
+	Password string `schema:"password"`
+}
+
 // Create will creating new user
 //
 // POST /signup
@@ -32,6 +40,11 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		panic(err)
 	}
-	fmt.Fprintln(w, r.PostForm["email"])
-	fmt.Fprintln(w, r.PostForm["password"])
+
+	dec := schema.NewDecoder()
+	var form SignUpForm
+	if err := dec.Decode(&form, r.PostForm); err != nil {
+		panic(err)
+	}
+	fmt.Fprintln(w, form)
 }
