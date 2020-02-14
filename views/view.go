@@ -8,6 +8,7 @@ import (
 
 var (
 	layoutDir   string = "views/layouts/"
+	templateDir string = "views/"
 	templateExt string = ".gohtml"
 )
 
@@ -32,6 +33,8 @@ func (v *View) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // NewView will get parsed template
 func NewView(layout string, files ...string) *View {
+	addTemplatePath(files)
+	addTemplateExt(files)
 	files = append(files, layoutFiles()...) // using ... is to unpack the slice
 
 	t, err := template.ParseFiles(files...)
@@ -53,4 +56,24 @@ func layoutFiles() []string {
 		panic(err)
 	}
 	return files
+}
+
+// addTemplatePath, append template path
+// infront of template name
+//
+// Eg: {home} become {views/home}
+func addTemplatePath(files []string) {
+	for i, f := range files {
+		files[i] = templateDir + f
+	}
+}
+
+// addTemplateExt, append template extention
+// to behind of template name
+//
+// Eg: {home} become {home.gohtml}
+func addTemplateExt(files []string) {
+	for i, f := range files {
+		files[i] = f + templateExt
+	}
 }
